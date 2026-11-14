@@ -26,7 +26,7 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: >-
-            --allowedTools "Read,Grep,Glob,Bash(gh issue view:*),Bash(gh issue edit:*),Bash(gh issue comment:*)"
+            --allowedTools "Read,Grep,Glob,Bash(gh issue view:*),Bash(gh issue edit:*),Bash(gh issue comment:*),Bash(gh issue list:*)"
           prompt: |
             Eres el agente de triage de issues de un juego de Tetris (HTML5 Canvas, JS vanilla, sin dependencias).
             Toda la lógica está en `game.js`; `index.html` define los ids del DOM. Lee `CLAUDE.md` para la arquitectura.
@@ -40,8 +40,18 @@ jobs:
             1. Lee el issue con `gh issue view ${{ github.event.issue.number }} --repo ${{ github.repository }} --json title,body,labels`.
             2. Explora el código relevante (Read/Grep/Glob) para entender qué parte del juego afecta.
             3. Labels: usa solo `bug`, `enhancement`, `question`, `documentation`, `good first issue`, `duplicate`.
-               Aplica los adecuados con `gh issue edit N --add-label ...` y, si el issue ya tenía labels de esa lista
-               que dejaron de aplicar tras una edición, quítalos con `--remove-label`.
+               Criterios:
+               - `bug`: algo existente se comporta distinto a lo esperado o documentado (incluye colores,
+                 valores o textos incorrectos).
+               - `enhancement`: funcionalidad nueva o cambio deseado de algo que ya funciona como se diseñó.
+               - `question`: duda que no requiere cambios de código.
+               - `documentation`: cambios en README.md o CLAUDE.md.
+               - `good first issue`: solo si es pequeño, acotado y de bajo riesgo.
+               - `duplicate`: solo si existe otro issue igual (compruébalo con `gh issue list`).
+               OBLIGATORIO: aplica al menos una label con `gh issue edit N --repo ${{ github.repository }} --add-label ...`
+               y, si el issue ya tenía labels de esa lista que dejaron de aplicar tras una edición, quítalas con
+               `--remove-label`. Al terminar, verifica con
+               `gh issue view N --repo ${{ github.repository }} --json labels` que quedó al menos una.
             4. Publica UN solo comentario de diagnóstico, en español, que luego servirá para implementar la solución:
                - **Resumen**: una o dos frases.
                - **Tipo**: bug / mejora / pregunta / documentación.
@@ -54,5 +64,13 @@ jobs:
                Escribe el comentario en un archivo temporal y publícalo con
                `gh issue comment N --repo ${{ github.repository }} --edit-last --create-if-none --body-file <archivo>`
                para que, en ediciones, se actualice el comentario existente en lugar de duplicarlo.
+
+            Formato Markdown del comentario:
+            - Cada sección empieza con su título en negrita (`**Resumen**`) y se separa de la siguiente con una línea en blanco.
+            - No uses encabezados `#` ni HTML.
+            - Usa backticks para archivos, funciones, ids del DOM y valores (`game.js`, `COLORS`, `#board`).
+            - Los fragmentos de código van en bloques con lenguaje (```js).
+            - Usa listas con guiones o numeradas en vez de párrafos largos.
+            - Los criterios de aceptación van como checklist (`- [ ] ...`).
 
             Sé conciso y preciso. No modifiques código ni cierres el issue.
