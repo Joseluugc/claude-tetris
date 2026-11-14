@@ -85,6 +85,11 @@ Después abre `http://localhost:8000` en el navegador.
 | `↓`       | Soft drop (bajar más rápido)      |
 | `Espacio` | Hard drop (caída instantánea)     |
 | `P`       | Pausar / reanudar                 |
+| `T`       | Alternar tema claro / oscuro      |
+
+### Tema claro / oscuro
+
+Además de la tecla `T`, hay un botón en el panel lateral para alternar entre tema claro y oscuro. La elección se guarda en `localStorage` y persiste al recargar; si no hay una elección guardada, se usa la preferencia del sistema (`prefers-color-scheme`). Los colores del UI son variables CSS (`:root` y `[data-theme="light"]` en `style.css`).
 
 ---
 
