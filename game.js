@@ -28,6 +28,87 @@ const PIECES = [
 
 const LINE_SCORES = [0, 100, 300, 500, 800];
 
+// ---- Sound effects (Web Audio, no external assets) ----
+let audioCtx = null;
+
+function getAudio() {
+  if (!audioCtx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    audioCtx = new AC();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+// Play a tone with optional pitch slide, starting `delay` seconds from now.
+function tone({ freq, endFreq, dur = 0.15, type = 'square', vol = 0.12, delay = 0 }) {
+  const ac = getAudio();
+  if (!ac) return;
+  const t = ac.currentTime + delay;
+  const osc = ac.createOscillator();
+  const gain = ac.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, t);
+  if (endFreq) osc.frequency.exponentialRampToValueAtTime(endFreq, t + dur);
+  gain.gain.setValueAtTime(vol, t);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  osc.connect(gain).connect(ac.destination);
+  osc.start(t);
+  osc.stop(t + dur + 0.02);
+}
+
+function noise(dur, vol, delay = 0) {
+  const ac = getAudio();
+  if (!ac) return;
+  const t = ac.currentTime + delay;
+  const buf = ac.createBuffer(1, Math.ceil(ac.sampleRate * dur), ac.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+  const src = ac.createBufferSource();
+  const filter = ac.createBiquadFilter();
+  const gain = ac.createGain();
+  src.buffer = buf;
+  filter.type = 'lowpass';
+  filter.frequency.value = 1200;
+  gain.gain.setValueAtTime(vol, t);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  src.connect(filter).connect(gain).connect(ac.destination);
+  src.start(t);
+}
+
+const SFX = {
+  move()   { tone({ freq: 220, dur: 0.04, type: 'triangle', vol: 0.06 }); },
+  rotate() { tone({ freq: 380, endFreq: 560, dur: 0.07, type: 'square', vol: 0.07 }); },
+  lock() {
+    tone({ freq: 140, endFreq: 60, dur: 0.12, type: 'sine', vol: 0.25 });
+    noise(0.08, 0.12);
+  },
+  hardDrop() {
+    tone({ freq: 220, endFreq: 40, dur: 0.22, type: 'sawtooth', vol: 0.18 });
+    tone({ freq: 90, endFreq: 35, dur: 0.25, type: 'sine', vol: 0.3 });
+    noise(0.15, 0.25);
+  },
+  clear(n) {
+    // Ascending arpeggio; more rows => longer and higher. Tetris (4) gets a fanfare.
+    const base = [523.25, 659.25, 783.99, 1046.5, 1318.5, 1568];
+    const steps = n >= 4 ? 6 : n + 2;
+    for (let i = 0; i < steps; i++) {
+      tone({ freq: base[i], dur: 0.14, type: 'square', vol: 0.09, delay: i * 0.06 });
+      tone({ freq: base[i] * 2, dur: 0.1, type: 'triangle', vol: 0.05, delay: i * 0.06 });
+    }
+    if (n >= 4) tone({ freq: 2093, dur: 0.5, type: 'triangle', vol: 0.1, delay: steps * 0.06 });
+  },
+  levelUp() {
+    [659.25, 783.99, 987.77, 1318.5].forEach((f, i) =>
+      tone({ freq: f, dur: 0.12, type: 'triangle', vol: 0.12, delay: 0.35 + i * 0.07 }));
+  },
+  gameOver() {
+    [392, 330, 262, 196].forEach((f, i) =>
+      tone({ freq: f, endFreq: f * 0.9, dur: 0.3, type: 'sawtooth', vol: 0.12, delay: i * 0.22 }));
+  },
+};
+
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
 const nextCanvas = document.getElementById('next-canvas');
@@ -81,6 +162,7 @@ function tryRotate() {
     if (!collide(rotated, current.x + kick, current.y)) {
       current.shape = rotated;
       current.x += kick;
+      SFX.rotate();
       return;
     }
   }
@@ -106,7 +188,10 @@ function clearLines() {
   if (cleared) {
     lines += cleared;
     score += (LINE_SCORES[cleared] || 0) * level;
+    const prevLevel = level;
     level = Math.floor(lines / 10) + 1;
+    SFX.clear(cleared);
+    if (level > prevLevel) SFX.levelUp();
     dropInterval = Math.max(100, 1000 - (level - 1) * 90);
     updateHUD();
   }
@@ -122,7 +207,7 @@ function hardDrop() {
   const gy = ghostY();
   score += (gy - current.y) * 2;
   current.y = gy;
-  lockPiece();
+  lockPiece(true);
 }
 
 function softDrop() {
@@ -135,9 +220,11 @@ function softDrop() {
   }
 }
 
-function lockPiece() {
+function lockPiece(hard = false) {
   merge();
+  const before = lines;
   clearLines();
+  if (lines === before) (hard ? SFX.hardDrop : SFX.lock)();
   spawn();
 }
 
@@ -220,6 +307,7 @@ function drawNext() {
 
 function endGame() {
   gameOver = true;
+  SFX.gameOver();
   cancelAnimationFrame(animId);
   overlayTitle.textContent = 'GAME OVER';
   overlayScore.textContent = `Puntuación: ${score.toLocaleString()}`;
@@ -279,10 +367,10 @@ document.addEventListener('keydown', e => {
   if (paused || gameOver) return;
   switch (e.code) {
     case 'ArrowLeft':
-      if (!collide(current.shape, current.x - 1, current.y)) current.x--;
+      if (!collide(current.shape, current.x - 1, current.y)) { current.x--; SFX.move(); }
       break;
     case 'ArrowRight':
-      if (!collide(current.shape, current.x + 1, current.y)) current.x++;
+      if (!collide(current.shape, current.x + 1, current.y)) { current.x++; SFX.move(); }
       break;
     case 'ArrowDown':
       softDrop();
