@@ -121,8 +121,18 @@ const overlayTitle = document.getElementById('overlay-title');
 const overlayScore = document.getElementById('overlay-score');
 const restartBtn = document.getElementById('restart-btn');
 const themeBtn = document.getElementById('theme-toggle');
+const pauseMenu = document.getElementById('pause-menu');
+const pauseMain = document.getElementById('pause-main');
+const pauseControls = document.getElementById('pause-controls');
+const pauseLevelSel = document.getElementById('pause-start-level');
 
+let startLevel = 1;
+let baseLevel = 1; // startLevel fijado al iniciar la partida
 let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
+
+function intervalFor(lvl) {
+  return Math.max(100, 1000 - (lvl - 1) * 90);
+}
 
 function createBoard() {
   return Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
@@ -190,10 +200,10 @@ function clearLines() {
     lines += cleared;
     score += (LINE_SCORES[cleared] || 0) * level;
     const prevLevel = level;
-    level = Math.floor(lines / 10) + 1;
+    level = baseLevel + Math.floor(lines / 10);
     SFX.clear(cleared);
     if (level > prevLevel) SFX.levelUp();
-    dropInterval = Math.max(100, 1000 - (level - 1) * 90);
+    dropInterval = intervalFor(level);
     updateHUD();
   }
 }
@@ -332,19 +342,53 @@ function endGame() {
   cancelAnimationFrame(animId);
   overlayTitle.textContent = 'GAME OVER';
   overlayScore.textContent = `Puntuación: ${score.toLocaleString()}`;
+  pauseMenu.classList.add('hidden');
+  restartBtn.classList.remove('hidden');
+  blurActive();
   overlay.classList.remove('hidden');
 }
+
+// ---- Menú de pausa ----
+function blurActive() {
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+}
+
+function showPauseView(controls) {
+  pauseMain.classList.toggle('hidden', controls);
+  pauseControls.classList.toggle('hidden', !controls);
+}
+
+for (let i = 1; i <= 15; i++) {
+  const opt = document.createElement('option');
+  opt.value = String(i);
+  opt.textContent = String(i);
+  pauseLevelSel.appendChild(opt);
+}
+pauseLevelSel.addEventListener('change', () => {
+  const v = parseInt(pauseLevelSel.value, 10);
+  startLevel = v >= 1 && v <= 15 ? v : 1;
+});
+document.getElementById('pause-resume').addEventListener('click', () => togglePause());
+document.getElementById('pause-restart').addEventListener('click', () => { blurActive(); init(); });
+document.getElementById('pause-controls-btn').addEventListener('click', () => showPauseView(true));
+document.getElementById('pause-back').addEventListener('click', () => showPauseView(false));
 
 function togglePause() {
   if (gameOver) return;
   paused = !paused;
+  blurActive();
   if (!paused) {
+    overlay.classList.add('hidden');
     lastTime = performance.now();
     loop(lastTime);
   } else {
     cancelAnimationFrame(animId);
     overlayTitle.textContent = 'PAUSA';
     overlayScore.textContent = '';
+    restartBtn.classList.add('hidden');
+    pauseMenu.classList.remove('hidden');
+    showPauseView(false);
+    pauseLevelSel.value = String(startLevel);
     overlay.classList.remove('hidden');
   }
 }
@@ -369,23 +413,27 @@ function init() {
   board = createBoard();
   score = 0;
   lines = 0;
-  level = 1;
+  baseLevel = startLevel;
+  level = baseLevel;
   paused = false;
   gameOver = false;
-  dropInterval = 1000;
+  dropInterval = intervalFor(level);
   dropAccum = 0;
   lastTime = performance.now();
   next = randomPiece();
   spawn();
   updateHUD();
   overlay.classList.add('hidden');
+  pauseMenu.classList.add('hidden');
+  restartBtn.classList.remove('hidden');
+  blurActive();
   cancelAnimationFrame(animId);
   animId = requestAnimationFrame(loop);
 }
 
 document.addEventListener('keydown', e => {
-  if (e.code === 'KeyP') { togglePause(); return; }
-  if (e.code === 'KeyT') { toggleTheme(); return; }
+  if (e.code === 'KeyP' || e.code === 'Escape') { if (!e.repeat) togglePause(); return; }
+  if (e.code === 'KeyT') { if (!e.repeat) toggleTheme(); return; }
   if (paused || gameOver) return;
   switch (e.code) {
     case 'ArrowLeft':

@@ -84,8 +84,12 @@ Después abre `http://localhost:8000` en el navegador.
 | `↑` o `X` | Rotar la pieza en sentido horario |
 | `↓`       | Soft drop (bajar más rápido)      |
 | `Espacio` | Hard drop (caída instantánea)     |
-| `P`       | Pausar / reanudar                 |
+| `P` / `Esc` | Abrir / cerrar el menú de pausa |
 | `T`       | Alternar tema claro / oscuro      |
+
+### Menú de pausa
+
+`P` o `Esc` abren el menú de pausa (dentro de `#overlay`, contenedor `#pause-menu`, ids con prefijo `pause-`): Reanudar, Reiniciar, Ver controles y selector de Nivel inicial (1–15). Con el menú abierto solo responden `P`, `Esc` y `T`. El game over sigue mostrando solo el botón Reiniciar.
 
 ### Tema claro / oscuro
 
@@ -120,7 +124,7 @@ Contiene toda la lógica del juego. A grandes rasgos:
 - **Game loop** (`loop`): basado en `requestAnimationFrame`, acumula el tiempo transcurrido y baja la pieza una fila cuando se supera `dropInterval`.
 - **Limpieza de líneas** (`clearLines`): recorre el tablero de abajo hacia arriba; cada fila completa se elimina y se inserta una vacía en la cima.
 - **Puntuación**: usa la tabla clásica `[0, 100, 300, 500, 800]` multiplicada por el nivel actual; el hard drop suma 2 puntos por celda recorrida y el soft drop 1 punto por fila.
-- **Nivel y velocidad**: el nivel sube cada 10 líneas; la velocidad de caída se calcula como `max(100, 1000 − (level − 1) × 90)` milisegundos.
+- **Nivel y velocidad**: el nivel es `startLevel + floor(lines / 10)` (`startLevel` es el nivel inicial, 1–15, elegible en el menú de pausa y aplicado al reiniciar); la velocidad de caída se calcula como `max(100, 1000 − (level − 1) × 90)` milisegundos.
 - **Ghost piece** (`ghostY`): proyecta la posición final de la pieza actual hacia abajo y la dibuja con `globalAlpha = 0.2`.
 
 ### Flujo del juego
