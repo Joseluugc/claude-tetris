@@ -119,9 +119,16 @@ const levelEl = document.getElementById('level');
 const overlay = document.getElementById('overlay');
 const overlayTitle = document.getElementById('overlay-title');
 const overlayScore = document.getElementById('overlay-score');
+const pauseMenu = document.getElementById('pause-menu');
+const resumeBtn = document.getElementById('resume-btn');
 const restartBtn = document.getElementById('restart-btn');
+const gameOverRestartBtn = document.getElementById('gameover-restart-btn');
+const controlsBtn = document.getElementById('controls-btn');
+const controlsList = document.getElementById('controls-list');
+const startLevelSelect = document.getElementById('start-level');
 const themeBtn = document.getElementById('theme-toggle');
 
+let startLevel = 1;
 let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
 
 function createBoard() {
@@ -190,10 +197,10 @@ function clearLines() {
     lines += cleared;
     score += (LINE_SCORES[cleared] || 0) * level;
     const prevLevel = level;
-    level = Math.floor(lines / 10) + 1;
+    level = startLevel + Math.floor(lines / 10);
     SFX.clear(cleared);
     if (level > prevLevel) SFX.levelUp();
-    dropInterval = Math.max(100, 1000 - (level - 1) * 90);
+    dropInterval = intervalFor(level);
     updateHUD();
   }
 }
@@ -236,6 +243,10 @@ function spawn() {
     endGame();
   }
   drawNext();
+}
+
+function intervalFor(lvl) {
+  return Math.max(100, 1000 - (lvl - 1) * 90);
 }
 
 function updateHUD() {
@@ -332,6 +343,8 @@ function endGame() {
   cancelAnimationFrame(animId);
   overlayTitle.textContent = 'GAME OVER';
   overlayScore.textContent = `Puntuación: ${score.toLocaleString()}`;
+  pauseMenu.classList.add('hidden');
+  gameOverRestartBtn.classList.remove('hidden');
   overlay.classList.remove('hidden');
 }
 
@@ -339,13 +352,21 @@ function togglePause() {
   if (gameOver) return;
   paused = !paused;
   if (!paused) {
+    overlay.classList.add('hidden');
+    // Quita el foco del menú para que Space/Enter no activen un botón durante la partida
+    if (overlay.contains(document.activeElement)) document.activeElement.blur();
     lastTime = performance.now();
     loop(lastTime);
   } else {
     cancelAnimationFrame(animId);
     overlayTitle.textContent = 'PAUSA';
     overlayScore.textContent = '';
+    gameOverRestartBtn.classList.add('hidden');
+    pauseMenu.classList.remove('hidden');
+    controlsList.classList.add('hidden');
+    controlsBtn.setAttribute('aria-expanded', 'false');
     overlay.classList.remove('hidden');
+    resumeBtn.focus();
   }
 }
 
@@ -369,22 +390,23 @@ function init() {
   board = createBoard();
   score = 0;
   lines = 0;
-  level = 1;
+  level = startLevel;
   paused = false;
   gameOver = false;
-  dropInterval = 1000;
+  dropInterval = intervalFor(level);
   dropAccum = 0;
   lastTime = performance.now();
   next = randomPiece();
   spawn();
   updateHUD();
   overlay.classList.add('hidden');
+  if (overlay.contains(document.activeElement)) document.activeElement.blur();
   cancelAnimationFrame(animId);
   animId = requestAnimationFrame(loop);
 }
 
 document.addEventListener('keydown', e => {
-  if (e.code === 'KeyP') { togglePause(); return; }
+  if (e.code === 'KeyP' || e.code === 'Escape') { togglePause(); return; }
   if (e.code === 'KeyT') { toggleTheme(); return; }
   if (paused || gameOver) return;
   switch (e.code) {
@@ -409,7 +431,15 @@ document.addEventListener('keydown', e => {
   updateHUD();
 });
 
+for (let l = 1; l <= 10; l++) startLevelSelect.add(new Option(l, l));
+startLevelSelect.addEventListener('change', () => { startLevel = Number(startLevelSelect.value); });
+resumeBtn.addEventListener('click', togglePause);
 restartBtn.addEventListener('click', init);
+gameOverRestartBtn.addEventListener('click', init);
+controlsBtn.addEventListener('click', () => {
+  const open = controlsList.classList.toggle('hidden') === false;
+  controlsBtn.setAttribute('aria-expanded', String(open));
+});
 themeBtn.addEventListener('click', () => {
   toggleTheme();
   themeBtn.blur(); // evita que Space/Enter vuelvan a activar el botón durante la partida

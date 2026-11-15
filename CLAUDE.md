@@ -12,14 +12,14 @@ Open `index.html` directly, or serve statically: `python3 -m http.server 8000` a
 
 ## Architecture
 
-All logic lives in `game.js` (loaded as a classic script from `index.html`, strict mode). It relies on fixed DOM ids in `index.html`: `board`, `next-canvas`, `score`, `lines`, `level`, `overlay`, `overlay-title`, `overlay-score`, `restart-btn`.
+All logic lives in `game.js` (loaded as a classic script from `index.html`, strict mode). It relies on fixed DOM ids in `index.html`: `board`, `next-canvas`, `score`, `lines`, `level`, `overlay`, `overlay-title`, `overlay-score`, `pause-menu`, `resume-btn`, `restart-btn`, `gameover-restart-btn`, `controls-btn`, `controls-list`, `start-level`.
 
 - **State** is a set of module-level `let` globals (`board`, `current`, `next`, `score`, `lines`, `level`, `paused`, `gameOver`, `dropInterval`, `animId`, ...) reset by `init()`. `init()` is also the restart handler.
 - **Pieces/board** use color indices 1–7 (index into `COLORS` and `PIECES`; 0 = empty). A piece is `{shape, x, y}` where `shape` is a square matrix whose cell values are its color index.
 - **Loop**: `requestAnimationFrame` → `loop(ts)` accumulates `dropAccum` and gravity-drops or calls `lockPiece()` when `dropAccum >= dropInterval`; `draw()` is called every frame. `togglePause`/`endGame` stop it via `cancelAnimationFrame(animId)`; unpausing resets `lastTime` and re-enters `loop`.
 - **Input**: a single `keydown` listener (uses `e.code`: arrows, `KeyX` rotate, `Space` hard drop, `KeyP` pause) calls `collide` before mutating `current`, then `updateHUD()`.
 - **Spawn/game over**: `spawn()` promotes `next` to `current` and rolls a new `next`; if the new piece collides immediately, `endGame()` fires.
-- Pause and game over share the same overlay element (title/score text swapped).
+- Pause and game over share the overlay element; pause shows `#pause-menu` (resume/restart/controls/start-level select), game over shows only `#gameover-restart-btn`. `startLevel` (set by the select) seeds `level` in `init()`; level = `startLevel + floor(lines/10)`.
 
 ## Gotchas
 

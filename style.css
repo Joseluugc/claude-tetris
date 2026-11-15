@@ -181,6 +181,10 @@ kbd {
   border-radius: 4px;
 }
 
+.hidden {
+  display: none !important;
+}
+
 .overlay.hidden {
   display: none;
 }
@@ -206,7 +210,7 @@ kbd {
   color: var(--accent);
 }
 
-#restart-btn {
+.overlay-box button {
   margin-top: 8px;
   background: var(--accent);
   color: var(--on-accent);
@@ -220,6 +224,42 @@ kbd {
   transition: background 0.15s;
 }
 
-#restart-btn:hover {
+.overlay-box button:hover {
   background: var(--accent-hover);
+}
+
+.pause-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
+  min-width: 190px;
+}
+
+.controls-list {
+  list-style: none;
+  font-size: 12px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.level-select {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+.level-select select {
+  background: var(--panel-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 14px;
 }
