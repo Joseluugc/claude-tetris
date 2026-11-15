@@ -223,3 +223,62 @@ kbd {
 #restart-btn:hover {
   background: var(--accent-hover);
 }
+
+/* ---- Records (rec-* / start-*) ---- */
+#start-title {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 6px;
+  color: var(--accent);
+}
+.rec-block, #start-list { width: 100%; }
+.rec-block.hidden { display: none; }
+.rec-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+}
+.rec-table caption { font-size: 12px; letter-spacing: 2px; opacity: 0.7; padding-bottom: 4px; }
+.rec-table td { padding: 2px 6px; text-align: left; }
+.rec-table td.num { text-align: right; }
+.rec-table tr.rec-new { background: var(--accent); color: var(--on-accent); font-weight: 700; }
+.rec-stats {
+  margin: 6px 0 0;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  opacity: 0.85;
+}
+.rec-entry { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; font-size: 13px; }
+.rec-entry.hidden { display: none; }
+.rec-entry-row { display: flex; gap: 6px; }
+#rec-name, #start-level {
+  flex: 1;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: inherit;
+  font-size: 14px;
+}
+#rec-save, #start-btn, #rec-reset {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+#rec-save:hover, #start-btn:hover { background: var(--accent-hover); }
+#rec-reset {
+  background: transparent;
+  color: inherit;
+  border: 1px solid currentColor;
+  font-size: 12px;
+  font-weight: 400;
+  opacity: 0.7;
+}
+.rec-field { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+#start-screen.hidden { display: none; }

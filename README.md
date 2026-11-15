@@ -120,7 +120,7 @@ Contiene toda la lógica del juego. A grandes rasgos:
 - **Game loop** (`loop`): basado en `requestAnimationFrame`, acumula el tiempo transcurrido y baja la pieza una fila cuando se supera `dropInterval`.
 - **Limpieza de líneas** (`clearLines`): recorre el tablero de abajo hacia arriba; cada fila completa se elimina y se inserta una vacía en la cima.
 - **Puntuación**: usa la tabla clásica `[0, 100, 300, 500, 800]` multiplicada por el nivel actual; el hard drop suma 2 puntos por celda recorrida y el soft drop 1 punto por fila.
-- **Nivel y velocidad**: el nivel sube cada 10 líneas; la velocidad de caída se calcula como `max(100, 1000 − (level − 1) × 90)` milisegundos.
+- **Nivel y velocidad**: el nivel sube cada 10 líneas a partir del nivel inicial elegido (`startLevel + floor(lines/10)`); la velocidad de caída se calcula como `max(100, 1000 − (level − 1) × 90)` milisegundos.
 - **Ghost piece** (`ghostY`): proyecta la posición final de la pieza actual hacia abajo y la dibuja con `globalAlpha = 0.2`.
 
 ### Flujo del juego
@@ -144,6 +144,10 @@ init()
 Cuando una pieza recién generada ya colisiona al aparecer (`spawn`), se dispara `endGame()` y se muestra el overlay de **Game Over**.
 
 ---
+
+### Tabla de records local
+
+Al cargar aparece una pantalla de inicio con el top 5, el mejor combo, las líneas máximas en una partida y un selector de nivel inicial (1-15). Los datos se guardan en `localStorage['tetris-records']` con la forma `{top:[{name,score,lines,date}], bestCombo, maxLines}`; si el contenido está corrupto se usan valores por defecto. Un combo es una racha de piezas consecutivas que limpian al menos una línea. Al terminar la partida, si la puntuación entra en el top 5 se pide un nombre (máx. 12 caracteres) y se resalta la fila nueva. El botón "Resetear records" (con confirmación) borra todo.
 
 ## Tecnologías
 

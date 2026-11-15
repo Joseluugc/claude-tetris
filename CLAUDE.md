@@ -25,3 +25,9 @@ All logic lives in `game.js` (loaded as a classic script from `index.html`, stri
 
 - Canvas pixel size is duplicated: `index.html` hardcodes `300×600` (and `120×120` for next) to match `COLS*BLOCK` × `ROWS*BLOCK` in `game.js`. Change both together.
 - The drop interval formula (`max(100, 1000 − (level−1)×90)`), line scoring (`LINE_SCORES × level`), and level-up every 10 lines are described in README.md; keep README in sync if you change them.
+
+## Records (ids `rec-*` / `start-*`)
+
+- Pantalla de inicio `#start-screen` (`#start-list`, `#start-level`, `#start-btn`, `#rec-reset`); al cargar NO se llama `init()`, solo `showStartScreen()`. `draw()`/`drawNext()` toleran `current`/`next` sin definir.
+- Game over añade `#rec-over` (`#rec-entry`, `#rec-name`, `#rec-save`, `#rec-over-list`) dentro de `#overlay`. Datos en `localStorage['tetris-records']`; combo en `lockPiece()`. Render solo con `textContent`.
+- El `keydown` ignora eventos cuyo target es INPUT/TEXTAREA/SELECT y retorna si aún no hay `current`.

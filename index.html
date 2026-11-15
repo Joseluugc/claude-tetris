@@ -65,7 +65,30 @@
       <div class="overlay-box">
         <p id="overlay-title">GAME OVER</p>
         <p id="overlay-score"></p>
+        <div id="rec-over" class="rec-block hidden">
+          <form id="rec-entry" class="rec-entry hidden" autocomplete="off">
+            <label for="rec-name">¡Nuevo récord! Tu nombre:</label>
+            <div class="rec-entry-row">
+              <input id="rec-name" type="text" maxlength="12" placeholder="Nombre" />
+              <button id="rec-save" type="submit">Guardar</button>
+            </div>
+          </form>
+          <div id="rec-over-list"></div>
+        </div>
         <button id="restart-btn">Reiniciar</button>
+      </div>
+    </div>
+
+    <div id="start-screen" class="overlay">
+      <div class="overlay-box start-box">
+        <p id="start-title">TETRIS</p>
+        <div id="start-list"></div>
+        <div class="rec-field">
+          <label for="start-level">Nivel inicial</label>
+          <select id="start-level"></select>
+        </div>
+        <button id="start-btn" type="button">Jugar</button>
+        <button id="rec-reset" type="button">Resetear records</button>
       </div>
     </div>
     </div>
