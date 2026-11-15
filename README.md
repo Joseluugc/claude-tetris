@@ -91,6 +91,10 @@ Después abre `http://localhost:8000` en el navegador.
 
 Además de la tecla `T`, hay un botón en el panel lateral para alternar entre tema claro y oscuro. La elección se guarda en `localStorage` y persiste al recargar; si no hay una elección guardada, se usa la preferencia del sistema (`prefers-color-scheme`). Los colores del UI son variables CSS (`:root` y `[data-theme="light"]` en `style.css`).
 
+### Skins visuales
+
+Un selector «SKIN» en el panel lateral permite cambiar el aspecto de las piezas sin recargar: **Retro** (por defecto, cuadrados planos con brillo), **Neón** (fondo negro en ambos temas y resplandor con `shadowBlur`), **Pastel** (colores suaves y bordes redondeados) y **Pixel** (textura de píxeles claros/oscuros). La elección se guarda en `localStorage` (clave `skin`). Cada skin vive en el objeto `SKINS` de `game.js` (`colors`, `grid`, `forceBg`, `drawCell`) y `drawBlock` delega en el skin activo para tablero, ghost y NEXT.
+
 ---
 
 ## Cómo funciona
