@@ -88,6 +88,10 @@ Después abre `http://localhost:8000` en el navegador.
 | `P` / `Esc` | Pausar / reanudar               |
 | `T`       | Alternar tema claro / oscuro      |
 
+### Skins
+
+El selector **SKIN** del panel lateral cambia la apariencia del tablero sin recargar: **Retro** (colores planos), **Neon** (fondo negro con `shadowBlur`), **Pastel** (colores suaves, bordes redondeados) y **Pixel art** (textura de píxeles). La elección se guarda en `localStorage` (clave `skin`). Cada skin se define en `SKINS` (`game.js`) con su paleta, fondo/rejilla opcionales y una función `block` de dibujo.
+
 ### Tema claro / oscuro
 
 Además de la tecla `T`, hay un botón en el panel lateral para alternar entre tema claro y oscuro. La elección se guarda en `localStorage` y persiste al recargar; si no hay una elección guardada, se usa la preferencia del sistema (`prefers-color-scheme`). Los colores del UI son variables CSS (`:root` y `[data-theme="light"]` en `style.css`).
@@ -179,7 +183,7 @@ Algunos parámetros fáciles de tunear en `game.js`:
 | `COLS`         | Columnas del tablero                     | `10`                  |
 | `ROWS`         | Filas del tablero                        | `20`                  |
 | `BLOCK`        | Tamaño en píxeles de cada celda          | `30`                  |
-| `COLORS`       | Paleta de colores por tipo de pieza      | 7 colores             |
+| `SKINS`        | Skins: paleta, fondo/rejilla y función `block` de dibujo | 4 skins |
 | `LINE_SCORES`  | Puntos por 1, 2, 3 o 4 líneas eliminadas | `[0,100,300,500,800]` |
 | `dropInterval` | Velocidad inicial de caída en ms         | `1000`                |
 

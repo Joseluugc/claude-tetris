@@ -169,6 +169,17 @@ kbd {
   background: var(--border);
 }
 
+#skin-select {
+  background: var(--kbd-bg);
+  color: var(--text);
+  border: 1px solid var(--kbd-border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 /* ---- Overlay ---- */
 .overlay {
   position: absolute;
