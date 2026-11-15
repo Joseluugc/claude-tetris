@@ -270,7 +270,6 @@ const SKINS = {
     label: 'Retro',
     colors: COLORS,
     grid: null, // usa la rejilla del tema
-    forceBg: null,
     drawCell(context, x, y, size, color) {
       context.fillStyle = color;
       context.fillRect(x + 1, y + 1, size - 2, size - 2);
@@ -282,7 +281,6 @@ const SKINS = {
     label: 'Neón',
     colors: [null, '#00f0ff', '#fff200', '#d400ff', '#39ff14', '#ff1744', '#4d7cff', '#ff9100'],
     grid: '#1b1b2b',
-    forceBg: '#000000',
     drawCell(context, x, y, size, color) {
       context.shadowColor = color;
       context.shadowBlur = 12;
@@ -302,7 +300,6 @@ const SKINS = {
     label: 'Pastel',
     colors: [null, '#a8e6ef', '#fff3b0', '#d7b8f3', '#b9f0c6', '#ffb3ba', '#b5d0ff', '#ffd6a5'],
     grid: null,
-    forceBg: null,
     drawCell(context, x, y, size, color) {
       const r = Math.max(3, size * 0.28);
       context.fillStyle = color;
@@ -314,7 +311,7 @@ const SKINS = {
       context.arcTo(x + 2, y + 2, x + size - 2, y + 2, r);
       context.closePath();
       context.fill();
-      context.strokeStyle = 'rgba(0,0,0,0.12)';
+      context.strokeStyle = 'rgba(0,0,0,0.3)';
       context.lineWidth = 1;
       context.stroke();
     },
@@ -323,7 +320,6 @@ const SKINS = {
     label: 'Pixel',
     colors: [null, '#29b6f6', '#fdd835', '#ab47bc', '#66bb6a', '#ef5350', '#5c6bc0', '#ff9800'],
     grid: null,
-    forceBg: null,
     drawCell(context, x, y, size, color) {
       context.fillStyle = color;
       context.fillRect(x + 1, y + 1, size - 2, size - 2);
@@ -344,14 +340,12 @@ const SKINS = {
   },
 };
 
-let activeSkinName = 'retro';
 let activeSkin = SKINS.retro;
 
 function skinSelectEl() { return document.getElementById('skin-select'); }
 
 function applySkin(name, persist) {
   if (!Object.prototype.hasOwnProperty.call(SKINS, name)) name = 'retro';
-  activeSkinName = name;
   activeSkin = SKINS[name];
   document.documentElement.dataset.skin = name;
   const sel = skinSelectEl();
@@ -360,7 +354,7 @@ function applySkin(name, persist) {
     try { localStorage.setItem('skin', name); } catch (e) { /* ignore */ }
   }
   // Repinta de inmediato (necesario en pausa / game over); puede no haber partida aún
-  if (typeof current !== 'undefined' && current && next) { draw(); drawNext(); }
+  if (current && next) { draw(); drawNext(); }
 }
 
 function loadSkin() {
@@ -487,6 +481,9 @@ function init() {
 }
 
 document.addEventListener('keydown', e => {
+  const sel = skinSelectEl();
+  if (sel && document.activeElement === sel && e.code.startsWith('Arrow') === false && e.code !== 'Space') { /* deja al select */ }
+  else if (sel && document.activeElement === sel) sel.blur();
   if (e.code === 'KeyP') { togglePause(); return; }
   if (e.code === 'KeyT') { toggleTheme(); return; }
   if (paused || gameOver) return;

@@ -93,7 +93,7 @@ Además de la tecla `T`, hay un botón en el panel lateral para alternar entre t
 
 ### Skins visuales
 
-Un selector «SKIN» en el panel lateral permite cambiar el aspecto de las piezas sin recargar: **Retro** (por defecto, cuadrados planos con brillo), **Neón** (fondo negro en ambos temas y resplandor con `shadowBlur`), **Pastel** (colores suaves y bordes redondeados) y **Pixel** (textura de píxeles claros/oscuros). La elección se guarda en `localStorage` (clave `skin`). Cada skin vive en el objeto `SKINS` de `game.js` (`colors`, `grid`, `forceBg`, `drawCell`) y `drawBlock` delega en el skin activo para tablero, ghost y NEXT.
+Un selector «SKIN» en el panel lateral permite cambiar el aspecto de las piezas sin recargar: **Retro** (por defecto, cuadrados planos con brillo), **Neón** (fondo negro en ambos temas y resplandor con `shadowBlur`), **Pastel** (colores suaves y bordes redondeados) y **Pixel** (textura de píxeles claros/oscuros). La elección se guarda en `localStorage` (clave `skin`). Cada skin vive en el objeto `SKINS` de `game.js` (`colors`, `grid`, `drawCell`) y `drawBlock` delega en el skin activo para tablero, ghost y NEXT.
 
 ---
 
