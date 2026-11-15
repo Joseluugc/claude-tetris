@@ -189,3 +189,7 @@ Algunos parámetros fáciles de tunear en `game.js`:
 ## Licencia
 
 Proyecto de uso libre con fines educativos y de práctica.
+
+## Records
+
+Top 5 de puntuaciones (nombre al game over), mejor combo y máximo de líneas en una partida, guardados en `localStorage` (clave `tetris-records`). Se muestran en la pantalla de inicio y en el game over; el botón "Resetear records" los borra.
