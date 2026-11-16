@@ -91,7 +91,7 @@ Después abre `http://localhost:8000` en el navegador.
 
 ### Skins
 
-El selector **SKIN** del panel lateral cambia la apariencia del tablero sin recargar: **Retro** (colores planos), **Neon** (fondo negro con `shadowBlur`), **Pastel** (colores suaves, bordes redondeados) y **Pixel art** (textura de píxeles). La elección se guarda en `localStorage` (clave `skin`). Cada skin se define en `SKINS` (`game.js`) con su paleta, fondo/rejilla opcionales y una función `block` de dibujo.
+El selector **SKIN** del panel lateral cambia la apariencia del tablero sin recargar: **Retro** (colores planos), **Neon** (fondo negro con `shadowBlur`), **Pastel** (colores suaves, bordes redondeados), **Pixel art** (textura de píxeles) y **Blanco y negro** (fondo negro, grises y un patrón distinto por pieza). La elección se guarda en `localStorage` (clave `skin`). Cada skin se define en `SKINS` (`game.js`) con su paleta, fondo/rejilla opcionales y una función `block` de dibujo.
 
 ### Tema claro / oscuro
 
@@ -184,7 +184,7 @@ Algunos parámetros fáciles de tunear en `game.js`:
 | `COLS`         | Columnas del tablero                     | `10`                  |
 | `ROWS`         | Filas del tablero                        | `20`                  |
 | `BLOCK`        | Tamaño en píxeles de cada celda          | `30`                  |
-| `SKINS`        | Skins: paleta, fondo/rejilla y función `block` de dibujo | 4 skins |
+| `SKINS`        | Skins: paleta, fondo/rejilla y función `block` de dibujo | 5 skins |
 | `LINE_SCORES`  | Puntos por 1, 2, 3 o 4 líneas eliminadas | `[0,100,300,500,800]` |
 | `dropInterval` | Velocidad inicial de caída en ms         | `1000`                |
 
