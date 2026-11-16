@@ -79,6 +79,42 @@ const SKINS = {
       context.strokeRect(px + 0.5, py + 0.5, size - 1, size - 1);
     },
   },
+  bw: {
+    label: 'Blanco y negro',
+    colors: [null, '#ffffff', '#e0e0e0', '#c2c2c2', '#a3a3a3', '#858585', '#666666', '#484848'],
+    bg: '#000000',
+    grid: '#222222',
+    block(context, px, py, size, color) {
+      const idx = SKINS.bw.colors.indexOf(color);
+      const x = px + 1, y = py + 1, s = size - 2;
+      context.fillStyle = color;
+      context.fillRect(x, y, s, s);
+      // Patrón por pieza para distinguirlas aunque los grises se parezcan
+      const dark = idx <= 4 ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.6)';
+      context.fillStyle = dark;
+      context.strokeStyle = dark;
+      context.lineWidth = 2;
+      const c = size / 2;
+      switch (idx) {
+        case 2: // raya horizontal
+          context.fillRect(x, c - 1, s, 2); break;
+        case 3: // raya vertical
+          context.fillRect(c - 1, y, 2, s); break;
+        case 4: // punto central
+          context.beginPath(); context.arc(c, c, size * 0.15, 0, Math.PI * 2); context.fill(); break;
+        case 5: // diagonal
+          context.beginPath(); context.moveTo(x + 3, y + s - 3); context.lineTo(x + s - 3, y + 3); context.stroke(); break;
+        case 6: // cruz
+          context.fillRect(x, c - 1, s, 2); context.fillRect(c - 1, y, 2, s); break;
+        case 7: // marco interior
+          context.strokeRect(x + 5, y + 5, s - 10, s - 10); break;
+        default: break; // 1: liso
+      }
+      context.strokeStyle = '#000';
+      context.lineWidth = 1;
+      context.strokeRect(px + 0.5, py + 0.5, size - 1, size - 1);
+    },
+  },
 };
 const DEFAULT_SKIN = 'retro';
 let skinName = DEFAULT_SKIN;
